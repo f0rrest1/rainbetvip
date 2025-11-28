@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { NavigationClient } from "./NavigationClient";
 import { DynamicSocialLinks } from "@/components/DynamicSocialLinks";
@@ -174,6 +175,7 @@ export default function RootLayout({
           </footer>
         </div>
         <TrackingPixel />
+        <Analytics />
       </body>
     </html>
   );

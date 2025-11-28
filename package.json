@@ -21,6 +21,7 @@
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
     "@uiw/react-md-editor": "^4.0.8",
+    "@vercel/analytics": "^1.5.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
     "dotenv": "^17.2.2",
