@@ -86,13 +86,6 @@ summary {
   cursor: pointer;
 }
 
-/* Enable hardware acceleration for smooth animations */
-* {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
 /* Unified background system - sections are transparent to show main gradient */
 .rbv-section-transparent {
   background: transparent;

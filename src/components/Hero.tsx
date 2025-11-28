@@ -76,10 +76,6 @@ export default function Hero() {
       <div className="absolute inset-0 rbv-gradient-hero" />
       <div className="absolute inset-0 rbv-gradient-mesh opacity-40" />
 
-      {/* Floating elements for depth */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-10 w-24 h-24 bg-gradient-to-r from-orange-500/10 to-cyan-500/10 rounded-full blur-2xl animate-float" style={{animationDelay: '2s'}} />
-
       <div className="relative mx-auto w-full max-w-6xl px-6 py-16 z-10">
         {/* Status badge */}
         <div className="inline-flex items-center gap-2 rbv-badge mb-6 animate-pulse-glow">
@@ -175,4 +171,3 @@ export default function Hero() {
     </section>
   );
 }
-
