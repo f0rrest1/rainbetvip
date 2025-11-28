@@ -5,6 +5,7 @@ interface CachedNewsData {
 }
 
 const CACHE_DURATION = 30 * 60 * 1000;
+const MAX_CACHE_SIZE = 100;
 const inMemoryCache = new Map<string, CachedNewsData>();
 
 const clientNewsCache = new Map<string, { data: unknown; timestamp: number }>();
@@ -29,6 +30,13 @@ export async function getCachedNews(source: string): Promise<unknown[] | null> {
 }
 
 export async function setCachedNews(source: string, articles: unknown[]): Promise<void> {
+  if (inMemoryCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = inMemoryCache.keys().next().value;
+    if (oldestKey) {
+      inMemoryCache.delete(oldestKey);
+    }
+  }
+
   const cacheData: CachedNewsData = {
     articles,
     timestamp: Date.now(),
@@ -37,6 +45,9 @@ export async function setCachedNews(source: string, articles: unknown[]): Promis
   
   inMemoryCache.set(source, cacheData);
   console.log(`Cached ${articles.length} articles from ${source}`);
+  if (Math.random() < 0.1) {
+    void cleanupOldCache();
+  }
 }
 
 export async function cleanupOldCache(): Promise<void> {

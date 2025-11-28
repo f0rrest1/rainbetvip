@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const transformedData = data.map(article => ({
       id: article.id,
       title: article.title,
-      slug: 'slug' in article ? (article as { slug: string }).slug : undefined,
+      slug: article.slug,
       publishedAt: article.publishedAt.toISOString(),
       source: article.source === 'firestore' ? 'RainbetVIP' : article.author,
       url: article.url || '#',
@@ -45,6 +45,5 @@ export async function GET(req: NextRequest) {
     return Response.json({ articles: [] }, { status: 200 });
   }
 }
-
 
 

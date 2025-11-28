@@ -8,7 +8,6 @@ import {
   deleteDoc, 
   query, 
   where, 
-  orderBy, 
   Timestamp 
 } from 'firebase/firestore';
 import { getDbInstance } from './firebase';
@@ -45,25 +44,8 @@ export class BonusCodeService {
    */
   static async getBonusCodes(filters?: BonusCodeFilters): Promise<ParsedBonusCode[]> {
     try {
-      let q = query(
-        collection(getDbInstance(), this.COLLECTION_NAME),
-        orderBy('createdAt', 'desc')
-      );
-
-      // Apply filters
-      if (filters?.isActive !== undefined) {
-        q = query(q, where('isActive', '==', filters.isActive));
-      }
-
-      if (filters?.messageType) {
-        q = query(q, where('messageType', '==', filters.messageType));
-      }
-
-      if (filters?.source) {
-        q = query(q, where('source', '==', filters.source));
-      }
-
-      const querySnapshot = await getDocs(q);
+      // Fetch all and filter client-side to avoid composite index requirements
+      const querySnapshot = await getDocs(collection(getDbInstance(), this.COLLECTION_NAME));
       const bonusCodes: ParsedBonusCode[] = [];
 
       querySnapshot.forEach((doc) => {
@@ -76,8 +58,19 @@ export class BonusCodeService {
         } as ParsedBonusCode);
       });
 
-      // Apply client-side filters
       let filteredCodes = bonusCodes;
+
+      if (filters?.isActive !== undefined) {
+        filteredCodes = filteredCodes.filter(code => code.isActive === filters.isActive);
+      }
+
+      if (filters?.messageType) {
+        filteredCodes = filteredCodes.filter(code => code.messageType === filters.messageType);
+      }
+
+      if (filters?.source) {
+        filteredCodes = filteredCodes.filter(code => code.source === filters.source);
+      }
 
       if (filters?.expired !== undefined) {
         const now = new Date();
@@ -86,6 +79,8 @@ export class BonusCodeService {
           return filters.expired ? isExpired : !isExpired;
         });
       }
+
+      filteredCodes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       return filteredCodes;
     } catch (error) {

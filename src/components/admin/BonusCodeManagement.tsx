@@ -21,7 +21,6 @@ export function BonusCodeManagement() {
   
   // Form states
   const [showCreateForm, setShowCreateForm] = useState(false);
-  // const [editingCode, setEditingCode] = useState<ParsedBonusCode | null>(null);
   const [filters, setFilters] = useState({
     isActive: undefined as boolean | undefined,
     messageType: '' as string,
@@ -42,6 +41,9 @@ export function BonusCodeManagement() {
 
   // Fetch bonus codes
   const fetchBonusCodes = useCallback(async () => {
+    if (!user) {
+      return;
+    }
     try {
       setIsLoading(true);
       setError(null);
@@ -52,10 +54,13 @@ export function BonusCodeManagement() {
       if (filters.source) queryParams.append('source', filters.source);
       if (filters.expired !== undefined) queryParams.append('expired', filters.expired.toString());
       
-      const response = await fetch(`/api/bonus-codes?${queryParams.toString()}`);
-      const result = await response.json();
-      
-      if (result.success) {
+      const result = await authenticatedFetchJson<{ success: boolean; data: ParsedBonusCode[]; error?: string }>(
+        `/api/bonus-codes?${queryParams.toString()}`,
+        { method: 'GET' },
+        user
+      );
+
+      if (result.success && Array.isArray(result.data)) {
         setBonusCodes(result.data);
       } else {
         setError(result.error || 'Failed to load bonus codes');
@@ -66,7 +71,7 @@ export function BonusCodeManagement() {
     } finally {
       setIsLoading(false);
     }
-  }, [filters]);
+  }, [filters, user]);
 
   // Create bonus code
   const createBonusCode = async () => {
@@ -490,10 +495,11 @@ export function BonusCodeManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
-              {bonusCodes.map((code) => {
+              {bonusCodes.map((code, index) => {
+                const rowKey = code.id || `${code.code}-${index}`;
                 const isExpired = dayjs(code.expiresAt).isBefore(dayjs());
                 return (
-                  <tr key={code.id} className="hover:bg-white/5">
+                  <tr key={rowKey} className="hover:bg-white/5">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-mono text-white">{code.code}</div>
                     </td>
@@ -571,6 +577,3 @@ export function BonusCodeManagement() {
     </div>
   );
 }
-
-
-

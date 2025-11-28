@@ -54,17 +54,12 @@ export const GET = async (req: NextRequest) => {
     const sanitized = activeCodes
       .filter(code => !code.expiresAt || new Date(code.expiresAt) >= now)
       .map(code => ({
-        id: code.id,
         code: code.code,
         rewardAmount: code.rewardAmount,
         wageredRequirement: code.wageredRequirement,
         claimsCount: code.claimsCount,
-        expiryDuration: code.expiryDuration,
         messageType: code.messageType,
-        createdAt: code.createdAt,
         expiresAt: code.expiresAt,
-        isActive: code.isActive,
-        source: code.source
       }));
 
     return NextResponse.json({ success: true, data: sanitized });

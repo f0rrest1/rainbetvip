@@ -2,20 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { getSiteSettings, SiteSettings } from '@/lib/settingsService';
+import { defaultSiteSettings } from '@/lib/defaultSettings';
 
 export function TrackingPixel() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [settings, setSettings] = useState<SiteSettings>(defaultSiteSettings);
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const siteSettings = await getSiteSettings();
-      setSettings(siteSettings);
+      try {
+        const siteSettings = await getSiteSettings();
+        setSettings(siteSettings);
+      } catch (error) {
+        console.error('Failed to fetch settings:', error);
+      }
     };
 
     fetchSettings();
   }, []);
 
-  if (!settings?.trackingPixel.enabled || !settings.trackingPixel.url) {
+  if (!settings.trackingPixel.enabled || !settings.trackingPixel.url) {
     return null;
   }
 
