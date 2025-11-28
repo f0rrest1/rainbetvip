@@ -4,6 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { getAuthInstance } from '@/lib/firebase';
 import { authenticatedFetchJson, handleApiError } from '@/lib/authenticatedFetch';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 
 interface FloatingBox {
   id: string;
@@ -51,7 +55,7 @@ const defaultSettings: SiteSettings = {
     subHeading: 'with VIP Bonuses',
     statusBadge: 'VIP Exclusive Offers Available Now',
     description: 'Join thousands of VIP players and unlock premium rewards, exclusive bonuses, and personalized gaming experiences.',
-    bonusMessage: '🎁 Exclusive bonus codes available below - Limited time offers!'
+    bonusMessage: 'Exclusive bonus codes available below - Limited time offers!'
   },
   floatingBoxes: [
     {
@@ -85,13 +89,13 @@ export function Settings() {
   const fetchSettings = useCallback(async () => {
     try {
       if (!user) return;
-      
+
       const response = await authenticatedFetchJson<{ success: boolean; data: SiteSettings }>(
         '/api/admin/settings',
         { method: 'GET' },
         user
       );
-      
+
       if (response.success) {
         setSettings({ ...defaultSettings, ...response.data });
       }
@@ -106,7 +110,6 @@ export function Settings() {
   useEffect(() => {
     // Monitor authentication state
     const unsubscribe = onAuthStateChanged(getAuthInstance(), (currentUser) => {
-      console.log('Auth state changed:', currentUser ? 'User logged in' : 'User not logged in');
       setUser(currentUser);
       setAuthLoading(false);
     });
@@ -147,16 +150,16 @@ export function Settings() {
   const saveSettings = async () => {
     setIsSaving(true);
     setSaveMessage('');
-    
+
     try {
       // Check authentication
       if (!user) {
         throw new Error('You must be logged in to save settings. Please go to the admin login page.');
       }
-      
+
       // Validate settings first
       validateSettings();
-      
+
       const response = await authenticatedFetchJson<{ success: boolean; message?: string }>(
         '/api/admin/settings',
         {
@@ -165,9 +168,8 @@ export function Settings() {
         },
         user
       );
-      
+
       if (response.success) {
-        console.log('Settings saved successfully');
         setSaveMessage('Settings saved successfully!');
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
@@ -222,8 +224,8 @@ export function Settings() {
   const updateFloatingBox = (boxIndex: number, field: string, value: string | boolean) => {
     setSettings(prev => ({
       ...prev,
-      floatingBoxes: prev.floatingBoxes?.map((box, index) => 
-        index === boxIndex 
+      floatingBoxes: prev.floatingBoxes?.map((box, index) =>
+        index === boxIndex
           ? { ...box, [field]: value }
           : box
       ) || []
@@ -278,8 +280,8 @@ export function Settings() {
       {/* Save Message */}
       {saveMessage && (
         <div className={`p-3 rounded-lg text-sm ${
-          saveMessage.includes('Error') 
-            ? 'bg-red-500/20 border border-red-500/50 text-red-300' 
+          saveMessage.includes('Error')
+            ? 'bg-red-500/20 border border-red-500/50 text-red-300'
             : 'bg-green-500/20 border border-green-500/50 text-green-300'
         }`}>
           {saveMessage}
@@ -350,7 +352,7 @@ export function Settings() {
                 value={settings.heroContent.bonusMessage}
                 onChange={(e) => updateHeroContent('bonusMessage', e.target.value)}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-                placeholder="🎁 Exclusive bonus codes available below - Limited time offers!"
+                placeholder="Exclusive bonus codes available below - Limited time offers!"
               />
               <p className="text-white/60 text-sm mt-2">
                 This message appears prominently in the hero section to direct users to bonus codes.
@@ -391,7 +393,7 @@ export function Settings() {
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
         <h3 className="text-xl font-semibold text-white mb-4">Floating Bonus Boxes</h3>
         <p className="text-white/70 text-sm mb-6">Customize the floating bonus boxes that appear on the hero section</p>
-        
+
         <div className="space-y-6">
           {settings.floatingBoxes?.map((box, index) => (
             <div key={box.id} className="border border-white/10 rounded-lg p-4">
@@ -480,7 +482,7 @@ export function Settings() {
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
         <h3 className="text-xl font-semibold text-white mb-4">Tracking Pixel</h3>
         <p className="text-white/70 text-sm mb-6">Add a tracking pixel (1x1 iframe) to your site for analytics</p>
-        
+
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <input
@@ -494,7 +496,7 @@ export function Settings() {
               Enable tracking pixel
             </label>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-white/90 mb-2">Tracking URL</label>
             <input
@@ -509,15 +511,6 @@ export function Settings() {
               This URL will be loaded in a 1x1 pixel invisible iframe on every page
             </p>
           </div>
-          
-          {settings.trackingPixel.enabled && settings.trackingPixel.url && (
-            <div className="p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
-              <p className="text-yellow-300 text-sm">
-                ⚠️ <strong>Privacy Notice:</strong> Make sure you comply with privacy laws (GDPR, CCPA) when using tracking pixels. 
-                Consider adding this to your privacy policy.
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
@@ -525,20 +518,20 @@ export function Settings() {
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
         <h3 className="text-xl font-semibold text-white mb-4">Social Links</h3>
         <p className="text-white/70 text-sm mb-6">Manage which social links appear in the footer and their URLs</p>
-        
+
         <div className="space-y-4">
           {Object.entries(settings.socialLinks).map(([platform, config]) => (
             <div key={platform} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 bg-white/5 rounded-lg">
               <div className="flex items-center gap-3">
-                <span className="text-lg">
-                  {platform === 'discord' && '💬'}
-                  {platform === 'instagram' && '📷'}
-                  {platform === 'youtube' && '📺'}
-                  {platform === 'twitter' && '🐦'}
+                <span className="text-lg text-white/90">
+                  {platform === 'discord' && <ChatBubbleOutlineIcon fontSize="small" />}
+                  {platform === 'instagram' && <InstagramIcon fontSize="small" />}
+                  {platform === 'youtube' && <YouTubeIcon fontSize="small" />}
+                  {platform === 'twitter' && <TwitterIcon fontSize="small" />}
                 </span>
                 <span className="font-medium text-white capitalize">{platform}</span>
               </div>
-              
+
               <input
                 type="url"
                 value={config.url}
@@ -546,7 +539,7 @@ export function Settings() {
                 className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all text-sm"
                 placeholder={`${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`}
               />
-              
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"

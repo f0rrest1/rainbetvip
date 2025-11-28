@@ -29,7 +29,6 @@ type NewsAPIArticle = {
   content: string;
 };
 
-// Casino and crypto gaming focused RSS feeds
 const sources: { url: string; category: string; name: string }[] = [
   { url: "https://www.igamingbusiness.com/feed", category: "Industry News", name: "iGaming Business" },
   { url: "https://www.casinonewsdaily.com/feed/", category: "Casino News", name: "Casino News Daily" },
@@ -50,19 +49,13 @@ function withinDays(date: Date, days: number): boolean {
 
 function passesKeywordFilter(title: string): boolean {
   const include = [
-    // Core casino gaming terms
     "casino", "gambling", "betting", "gaming", "wager", "jackpot",
-    // Crypto gaming specific
     "crypto casino", "bitcoin casino", "ethereum gambling", "crypto betting",
     "blockchain gaming", "nft gaming", "defi gambling", "web3 casino",
-    // Game types
     "slots", "poker", "blackjack", "roulette", "baccarat", "dice", "crash",
-    // Industry terms
     "igaming", "online casino", "live dealer", "game provider", "rng",
-    // Regulation and restrictions
     "gambling regulation", "casino license", "gaming law", "restriction",
     "ban", "legalization", "compliance", "jurisdiction",
-    // New developments
     "new casino", "casino opening", "gaming expansion", "market entry"
   ];
   const exclude = ["porn", "adult", "xxx", "dating", "stock market", "traditional finance"];
@@ -71,30 +64,27 @@ function passesKeywordFilter(title: string): boolean {
   return include.some((x) => t.includes(x));
 }
 
-// More permissive filter for NewsAPI articles (since we're already targeting gambling content)
 function passesNewsAPIFilter(title: string): boolean {
   const exclude = ["porn", "adult", "xxx", "dating"];
   const t = title.toLowerCase();
   return !exclude.some((x) => t.includes(x));
 }
 
-// Helper function to clean HTML tags from text
 function stripHtmlTags(text: string): string {
   if (!text) return text;
   return text
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
-    .replace(/&amp;/g, '&') // Replace &amp; with &
-    .replace(/&lt;/g, '<') // Replace &lt; with <
-    .replace(/&gt;/g, '>') // Replace &gt; with >
-    .replace(/&quot;/g, '"') // Replace &quot; with "
-    .replace(/&#39;/g, "'") // Replace &#39; with '
-    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-    .trim(); // Remove leading/trailing whitespace
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 async function fetchFromNewsAPI(days: number = 7): Promise<AggregatedArticle[]> {
-  // Check cache first
   const cachedData = await getCachedNews('newsapi') as AggregatedArticle[] | null;
   if (cachedData) {
     return cachedData;
@@ -102,20 +92,18 @@ async function fetchFromNewsAPI(days: number = 7): Promise<AggregatedArticle[]> 
 
   const apiKey = process.env.NEWSAPI_ORG_API_KEY;
   if (!apiKey) {
-    console.log("📝 NewsAPI key not found - skipping NewsAPI sources");
+    console.log("NewsAPI key not found - skipping NewsAPI sources");
     return [];
   }
 
-  // Check rate limits
   if (!canMakeNewsAPICall()) {
-    console.log("⏳ NewsAPI rate limit reached - skipping for now");
+    console.log("NewsAPI rate limit reached - skipping for now");
     return [];
   }
 
   const results: AggregatedArticle[] = [];
   const fromDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  // Reduced queries to save API calls - focus on most important ones
   const queries = [
     { q: "crypto casino OR bitcoin casino OR blockchain gaming", category: "Crypto Gaming" },
     { q: "casino regulation OR gambling ban OR gaming license", category: "Regulation Updates" },
@@ -125,20 +113,20 @@ async function fetchFromNewsAPI(days: number = 7): Promise<AggregatedArticle[]> 
 
   try {
     for (const query of queries) {
-      console.log(`📡 Fetching NewsAPI articles for: ${query.q}`);
+      console.log(`Fetching NewsAPI articles for: ${query.q}`);
       
       const url = new URL("https://newsapi.org/v2/everything");
       url.searchParams.set("q", query.q);
       url.searchParams.set("from", fromDate);
       url.searchParams.set("sortBy", "publishedAt");
       url.searchParams.set("language", "en");
-      url.searchParams.set("pageSize", "30"); // Reduced from 50 to save API calls
+      url.searchParams.set("pageSize", "30");
       url.searchParams.set("apiKey", apiKey);
 
       const response = await fetch(url.toString());
       
       if (!response.ok) {
-        console.log(`❌ NewsAPI query failed for "${query.q}": ${response.status}`);
+        console.log(`NewsAPI query failed for "${query.q}": ${response.status}`);
         continue;
       }
 
@@ -148,7 +136,6 @@ async function fetchFromNewsAPI(days: number = 7): Promise<AggregatedArticle[]> 
         for (const article of data.articles as NewsAPIArticle[]) {
           if (!article.title || !article.url) continue;
           
-          // Use permissive filter for NewsAPI (we already searched for gambling terms)
           if (!passesNewsAPIFilter(article.title)) continue;
           
           const publishedAt = new Date(article.publishedAt);
@@ -162,21 +149,20 @@ async function fetchFromNewsAPI(days: number = 7): Promise<AggregatedArticle[]> 
             url: article.url,
             category: query.category,
             excerpt: article.description ? stripHtmlTags(article.description).substring(0, 300) : undefined,
-            imageUrl: undefined, // No images for faster loading
+            imageUrl: undefined,
           });
         }
         
-        console.log(`✅ NewsAPI: Successfully fetched ${data.articles.length} articles for "${query.q}"`);
+        console.log(`NewsAPI: Successfully fetched ${data.articles.length} articles for "${query.q}"`);
       }
     }
 
-    // Record the API call and cache results
     recordNewsAPICall();
     if (results.length > 0) {
       await setCachedNews('newsapi', results);
     }
   } catch (error) {
-    console.log("❌ NewsAPI fetch error:", error instanceof Error ? error.message : 'Unknown error');
+    console.log("NewsAPI fetch error:", error instanceof Error ? error.message : 'Unknown error');
   }
 
   return results;
@@ -186,26 +172,22 @@ export async function aggregateNews(opts: AggregatorOptions = {}): Promise<Aggre
   const days = opts.days ?? 7;
   const categoryFilter = opts.category;
 
-  // Clean up old cache entries periodically
-  if (Math.random() < 0.1) { // 10% chance
+  if (Math.random() < 0.1) {
     cleanupOldCache().catch(console.error);
   }
 
   const results: AggregatedArticle[] = [];
   
-  // Fetch from RSS sources, alternative sources, and NewsAPI in parallel
   const [rssResults, alternativeResults, newsAPIResults] = await Promise.all([
-    // Original RSS Sources (with caching)
     Promise.all(
       sources.map(async (source) => {
-        // Check cache first
         const cachedData = await getCachedNews(`rss-${source.name}`) as AggregatedArticle[] | null;
         if (cachedData) {
           return cachedData;
         }
 
         try {
-          console.log(`🔗 Fetching RSS from ${source.name}...`);
+          console.log(`Fetching RSS from ${source.name}...`);
           const feed = await parser.parseURL(source.url);
           
           const sourceResults: AggregatedArticle[] = [];
@@ -226,7 +208,6 @@ export async function aggregateNews(opts: AggregatorOptions = {}): Promise<Aggre
             const category = source.category;
             if (categoryFilter && categoryFilter !== category) continue;
             
-            // Extract and clean excerpt from content (no images)
             const cleanContent = stripHtmlTags(content);
             const excerpt = cleanContent.length > 200 ? cleanContent.substring(0, 200) + "..." : cleanContent;
             
@@ -238,25 +219,23 @@ export async function aggregateNews(opts: AggregatorOptions = {}): Promise<Aggre
               url: link,
               category,
               excerpt: excerpt || undefined,
-              imageUrl: undefined, // No images for faster loading
+              imageUrl: undefined,
             });
           }
           
-          // Cache the results
           if (sourceResults.length > 0) {
             await setCachedNews(`rss-${source.name}`, sourceResults);
           }
           
-          console.log(`✅ RSS: Successfully fetched ${sourceResults.length} relevant articles from ${source.name}`);
+          console.log(`RSS: Successfully fetched ${sourceResults.length} relevant articles from ${source.name}`);
           return sourceResults;
         } catch (error) {
-          console.log(`❌ RSS: Failed to fetch from ${source.name}:`, error instanceof Error ? error.message : 'Unknown error');
+          console.log(`RSS: Failed to fetch from ${source.name}:`, error instanceof Error ? error.message : 'Unknown error');
           return [];
         }
       })
     ).then(results => results.flat()),
     
-    // Alternative RSS Sources (with caching)
     (async () => {
       const cachedData = await getCachedNews('alternative-sources') as AggregatedArticle[] | null;
       if (cachedData) {
@@ -270,28 +249,21 @@ export async function aggregateNews(opts: AggregatorOptions = {}): Promise<Aggre
       return results;
     })(),
     
-    // NewsAPI (already has caching)
     fetchFromNewsAPI(days)
   ]);
 
-  // Combine all results
   results.push(...rssResults, ...alternativeResults, ...newsAPIResults);
 
-  // Remove duplicates based on URL
   const uniqueResults = results.filter((article, index, self) => 
     index === self.findIndex(a => a.url === article.url)
   );
 
-  // Apply category filter if specified
   const filteredResults = categoryFilter 
     ? uniqueResults.filter(article => article.category === categoryFilter)
     : uniqueResults;
 
-  // Sort by date (newest first)
   filteredResults.sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt));
   
-  console.log(`📰 Total unique articles aggregated: ${filteredResults.length} (RSS: ${rssResults.length}, Alternative: ${alternativeResults.length}, NewsAPI: ${newsAPIResults.length})`);
+  console.log(`Total unique articles aggregated: ${filteredResults.length} (RSS: ${rssResults.length}, Alternative: ${alternativeResults.length}, NewsAPI: ${newsAPIResults.length})`);
   return filteredResults;
 }
-
-

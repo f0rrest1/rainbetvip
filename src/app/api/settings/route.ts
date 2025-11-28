@@ -25,7 +25,7 @@ export const GET = async (_req: NextRequest) => {
           subHeading: 'with VIP Bonuses',
           statusBadge: 'VIP Exclusive Offers Available Now',
           description: 'Join thousands of VIP players and unlock premium rewards, exclusive bonuses, and personalized gaming experiences.',
-          bonusMessage: '🎁 Exclusive bonus codes available below - Limited time offers!'
+          bonusMessage: 'Exclusive bonus codes available below - Limited time offers!'
         },
         floatingBoxes: [
           {
@@ -85,7 +85,7 @@ export const GET = async (_req: NextRequest) => {
           subHeading: 'with VIP Bonuses',
           statusBadge: 'VIP Exclusive Offers Available Now',
           description: 'Join thousands of VIP players and unlock premium rewards, exclusive bonuses, and personalized gaming experiences.',
-          bonusMessage: '🎁 Exclusive bonus codes available below - Limited time offers!'
+          bonusMessage: 'Exclusive bonus codes available below - Limited time offers!'
         },
         floatingBoxes: [
           {

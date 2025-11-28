@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 
 interface HeroContent {
   mainHeading: string;
@@ -25,7 +26,7 @@ export default function Hero() {
     subHeading: 'with VIP Bonuses',
     statusBadge: 'VIP Exclusive Offers Available Now',
     description: 'Join thousands of VIP players and unlock premium rewards, exclusive bonuses, and personalized gaming experiences.',
-    bonusMessage: '🎁 Exclusive bonus codes available below - Limited time offers!'
+    bonusMessage: 'Exclusive bonus codes available below - Limited time offers!'
   });
 
   const [floatingBoxes, setFloatingBoxes] = useState<FloatingBonusBox[]>([
@@ -95,7 +96,10 @@ export default function Hero() {
         {/* Enhanced subtitle */}
         <div className="mb-8 max-w-3xl">
           <p className="text-xl text-white/90 mb-3">
-            <span className="text-gradient-primary font-bold text-2xl">{heroContent.bonusMessage}</span>
+            <span className="text-gradient-primary font-bold text-2xl inline-flex items-center gap-2">
+              <CardGiftcardIcon fontSize="inherit" className="!w-6 !h-6" />
+              {heroContent.bonusMessage}
+            </span>
           </p>
           <p className="text-white/70">
             {heroContent.description}
@@ -171,5 +175,4 @@ export default function Hero() {
     </section>
   );
 }
-
 

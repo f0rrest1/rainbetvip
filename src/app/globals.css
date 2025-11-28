@@ -74,6 +74,18 @@ body {
   transition: background-color 0.3s ease;
 }
 
+button,
+a,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="file"],
+label[for],
+summary {
+  cursor: pointer;
+}
+
 /* Enable hardware acceleration for smooth animations */
 * {
   transform: translateZ(0);

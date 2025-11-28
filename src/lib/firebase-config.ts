@@ -13,9 +13,6 @@ const getFirebaseConfig = () => {
     return _firebaseConfig;
   }
 
-  // Add some debugging to understand what's happening
-  console.log('Attempting to load Firebase config...');
-
   const envVars = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -25,16 +22,6 @@ const getFirebaseConfig = () => {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
   };
 
-  console.log('Environment variables status:', {
-    hasApiKey: !!envVars.apiKey,
-    hasAuthDomain: !!envVars.authDomain,
-    hasProjectId: !!envVars.projectId,
-    hasStorageBucket: !!envVars.storageBucket,
-    hasMessagingSenderId: !!envVars.messagingSenderId,
-    hasAppId: !!envVars.appId
-  });
-
-  // Check for missing environment variables
   const missingVars = Object.entries(envVars)
     .filter(([, value]) => !value)
     .map(([key]) => `NEXT_PUBLIC_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
@@ -53,7 +40,6 @@ const getFirebaseConfig = () => {
     appId: envVars.appId!
   };
 
-  console.log('✅ Firebase config loaded successfully');
   return _firebaseConfig;
 };
 

@@ -15,6 +15,8 @@ import dynamic from 'next/dynamic';
 import { NewsItem, NewsFormData } from '@/types/news';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
 
 // Dynamically import the markdown editor to avoid SSR issues
 const MDEditor = dynamic(
@@ -324,7 +326,7 @@ export function NewsManagement() {
                   className="w-4 h-4 text-cyan-400 bg-white/10 border-white/20 rounded focus:ring-cyan-400 focus:ring-2"
                 />
                 <label htmlFor="priority" className="ml-2 text-sm text-white/90 flex items-center gap-1">
-                  <span className="text-yellow-400">⭐</span>
+                  <StarRoundedIcon className="text-yellow-400" fontSize="small" />
                   Priority article (appears first)
                 </label>
               </div>
@@ -363,7 +365,7 @@ export function NewsManagement() {
       <div className="space-y-4">
         {news.length === 0 ? (
           <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
-            <div className="text-6xl mb-4">📰</div>
+            <NewspaperIcon className="text-6xl mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No news articles yet</h3>
             <p className="text-white/70 mb-4">Start by adding your first news article</p>
             <button
@@ -379,7 +381,7 @@ export function NewsManagement() {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    {item.isPriority && <span className="text-yellow-400 text-lg">⭐</span>}
+                    {item.isPriority && <StarRoundedIcon className="text-yellow-400" fontSize="small" />}
                     <h3 className="text-lg font-semibold text-white">{item.title}</h3>
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       item.published 

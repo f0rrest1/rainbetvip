@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BonusCodeServiceAdmin } from "@/lib/bonusCodeServiceAdmin";
-// Removed unused import
 import { withAuth, withAdminAuth, AuthenticatedUser } from "@/lib/auth";
 import { validateAndSanitize, sanitizeError, UpdateBonusCodeSchema } from "@/lib/validation";
 
 export const GET = withAuth(async (
-  req: NextRequest,
-  user: AuthenticatedUser,
+  _req: NextRequest,
+  _user: AuthenticatedUser,
   { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
@@ -35,7 +34,7 @@ export const GET = withAuth(async (
 
 export const PUT = withAdminAuth(async (
   req: NextRequest,
-  user: AuthenticatedUser,
+  _user: AuthenticatedUser,
   { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
@@ -71,8 +70,8 @@ export const PUT = withAdminAuth(async (
 });
 
 export const DELETE = withAdminAuth(async (
-  req: NextRequest,
-  user: AuthenticatedUser,
+  _req: NextRequest,
+  _user: AuthenticatedUser,
   { params }: { params: Promise<{ id: string }> }
 ) => {
   try {

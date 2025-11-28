@@ -8,6 +8,8 @@ import { NewsItem } from '@/types/news';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
 
 export default function ArticlePage() {
   const [article, setArticle] = useState<NewsItem | null>(null);
@@ -25,9 +27,6 @@ export default function ArticlePage() {
         
         // Query by slug first, then fall back to ID for backwards compatibility
         let articleData: NewsItem | null = null;
-        
-        console.log('Looking for article with slug:', articleSlug);
-        
         // Try to get article by slug first (more efficient)
         const slugQuery = query(
           collection(getDbInstance(), 'news'),
@@ -40,7 +39,6 @@ export default function ArticlePage() {
         if (!slugSnapshot.empty) {
           const doc = slugSnapshot.docs[0];
           const data = doc.data();
-          console.log('Found article by slug:', { id: doc.id, slug: data.slug, title: data.title });
           articleData = {
             id: doc.id,
             source: 'firestore',
@@ -59,7 +57,6 @@ export default function ArticlePage() {
           if (!idSnapshot.empty) {
             const doc = idSnapshot.docs[0];
             const data = doc.data();
-            console.log('Found article by ID:', { id: doc.id, slug: data.slug, title: data.title });
             articleData = {
               id: doc.id,
               source: 'firestore',
@@ -103,7 +100,7 @@ export default function ArticlePage() {
       <div className="min-h-screen bg-[--background] text-[--foreground]">
         <div className="w-full px-6 py-8">
           <div className="flex flex-col items-center justify-center py-16">
-            <div className="text-6xl mb-4">📰</div>
+            <NewspaperIcon className="text-6xl mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Article Not Found</h2>
             <p className="text-white/70 mb-6">{error}</p>
             <Link
@@ -143,7 +140,7 @@ export default function ArticlePage() {
           {/* Article Header - with container */}
           <header className="mx-auto w-full max-w-4xl px-6 pb-8 border-b border-white/10">
             <div className="flex items-center gap-3 mb-4">
-              {article.isPriority && <span className="text-yellow-400 text-xl">⭐</span>}
+              {article.isPriority && <StarRoundedIcon className="text-yellow-400" fontSize="small" />}
               <span className="px-3 py-1 text-sm rounded-full bg-[--color-primary]/20 text-[--color-primary] border border-[--color-primary]/30">
                 RainbetVIP
               </span>

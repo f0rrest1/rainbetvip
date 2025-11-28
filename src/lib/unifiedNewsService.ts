@@ -26,10 +26,10 @@ async function getFirestoreNews(): Promise<UnifiedNewsItem[]> {
     const newsCollection = collection(getDbInstance(), 'news');
     const querySnapshot = await getDocs(newsCollection);
     const firestoreNews: UnifiedNewsItem[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data() as NewsItem;
-      
+
       // Filter for published articles
       if (data.published) {
         firestoreNews.push({
@@ -46,7 +46,7 @@ async function getFirestoreNews(): Promise<UnifiedNewsItem[]> {
         });
       }
     });
-    
+
     return firestoreNews;
   } catch (error) {
     console.error('Error fetching Firestore news:', error);
@@ -60,7 +60,7 @@ async function getFirestoreNews(): Promise<UnifiedNewsItem[]> {
 async function getApiNews(days: number = 7): Promise<UnifiedNewsItem[]> {
   try {
     const apiArticles = await aggregateNews({ days });
-    
+
     return apiArticles.map((article: AggregatedArticle): UnifiedNewsItem => ({
       id: article.id,
       title: article.title,
@@ -85,7 +85,7 @@ async function getApiNews(days: number = 7): Promise<UnifiedNewsItem[]> {
 export async function getUnifiedNews(days: number = 7): Promise<UnifiedNewsItem[]> {
   try {
     console.log('Getting unified news...');
-    
+
     // Fetch news from both sources in parallel, but don't fail if one fails
     const [firestoreNews, apiNews] = await Promise.allSettled([
       getFirestoreNews(),
@@ -112,20 +112,20 @@ export async function getUnifiedNews(days: number = 7): Promise<UnifiedNewsItem[
       // Priority articles first
       if (a.isPriority && !b.isPriority) return -1;
       if (!a.isPriority && b.isPriority) return 1;
-      
+
       // If both have same priority status, sort by date (newest first)
       return b.publishedAt.getTime() - a.publishedAt.getTime();
     });
 
-    console.log(`📰 Unified news: ${firestoreArticles.length} from Firestore, ${apiArticles.length} from APIs, ${allNews.length} total`);
-    
+    console.log(`Unified news: ${firestoreArticles.length} from Firestore, ${apiArticles.length} from APIs, ${allNews.length} total`);
+
     return allNews;
   } catch (error) {
     console.error('Error getting unified news:', error);
     // If everything fails, try to at least get API news as fallback
     try {
       const apiNews = await getApiNews(days);
-      console.log('📰 Fallback: Using API news only');
+      console.log('Fallback: Using API news only');
       return apiNews;
     } catch (fallbackError) {
       console.error('Fallback also failed:', fallbackError);
@@ -139,9 +139,9 @@ export async function getUnifiedNews(days: number = 7): Promise<UnifiedNewsItem[
  */
 export async function getUnifiedNewsByCategory(category: string, days: number = 7): Promise<UnifiedNewsItem[]> {
   const allNews = await getUnifiedNews(days);
-  
-  return allNews.filter(article => 
-    article.category === category || 
+
+  return allNews.filter(article =>
+    article.category === category ||
     (article.source === 'firestore' && category === 'Custom')
   );
 }
@@ -151,6 +151,6 @@ export async function getUnifiedNewsByCategory(category: string, days: number = 
  */
 export async function getPriorityNews(): Promise<UnifiedNewsItem[]> {
   const allNews = await getUnifiedNews();
-  
+
   return allNews.filter(article => article.isPriority);
 }

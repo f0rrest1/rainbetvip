@@ -22,7 +22,7 @@ export default function AdminPanel() {
           // Check if user has admin claims
           const idTokenResult = await user.getIdTokenResult();
           const isAdmin = idTokenResult.claims.admin === true;
-          
+
           if (isAdmin) {
             setIsAuthenticated(true);
           } else {
@@ -72,9 +72,9 @@ export default function AdminPanel() {
   }
 
   const tabs = [
-    { id: 'news' as TabType, label: 'News Management', icon: '📰' },
-    { id: 'bonus-codes' as TabType, label: 'Bonus Codes', icon: '🎁' },
-    { id: 'settings' as TabType, label: 'Settings', icon: '⚙️' }
+    { id: 'news' as TabType, label: 'News Management', icon: '' },
+    { id: 'bonus-codes' as TabType, label: 'Bonus Codes', icon: '' },
+    { id: 'settings' as TabType, label: 'Settings', icon: '' }
   ];
 
   return (

@@ -86,7 +86,7 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-                placeholder="admin@rainbetvip.com"
+                placeholder="email@domain.com"
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function AdminLogin() {
 
           {/* Back to site link */}
           <div className="mt-8 text-center">
-            <Link 
+            <Link
               href="/"
               className="text-white/70 hover:text-white transition-colors text-sm flex items-center justify-center gap-1"
             >
