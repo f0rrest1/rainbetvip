@@ -28,7 +28,7 @@ export async function verifyIdToken(idToken: string): Promise<AuthenticatedUser>
       email: decodedToken.email,
       role: decodedToken.admin ? 'admin' : 'user'
     };
-  } catch (_error) {
+  } catch {
     throw new AuthError('Invalid or expired token', 'INVALID_TOKEN');
   }
 }

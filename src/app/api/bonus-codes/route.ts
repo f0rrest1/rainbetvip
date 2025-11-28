@@ -1,38 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BonusCodeServiceAdmin } from "@/lib/bonusCodeServiceAdmin";
-import { withAdminAuth, AuthenticatedUser } from "@/lib/auth";
+import { withAdminAuth, AuthenticatedUser, authenticateRequest, requireAdmin } from "@/lib/auth";
 import { validateAndSanitize, sanitizeError, CreateBonusCodeSchema, BonusCodeFiltersSchema } from "@/lib/validation";
+
+async function isAdminRequest(req: NextRequest): Promise<boolean> {
+  try {
+    const user = await authenticateRequest(req);
+    requireAdmin(user);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export const GET = async (req: NextRequest) => {
   try {
-    const { searchParams } = new URL(req.url);
+    const adminRequest = await isAdminRequest(req);
 
-    // Parse and validate query parameters for filtering
-    const rawFilters: Record<string, unknown> = {};
+    if (adminRequest) {
+      const { searchParams } = new URL(req.url);
 
-    if (searchParams.get('isActive') !== null) {
-      rawFilters.isActive = searchParams.get('isActive') === 'true';
+      // Parse and validate query parameters for filtering
+      const rawFilters: Record<string, unknown> = {};
+
+      if (searchParams.get('isActive') !== null) {
+        rawFilters.isActive = searchParams.get('isActive') === 'true';
+      }
+
+      if (searchParams.get('messageType')) {
+        rawFilters.messageType = searchParams.get('messageType');
+      }
+
+      if (searchParams.get('source')) {
+        rawFilters.source = searchParams.get('source');
+      }
+
+      if (searchParams.get('expired') !== null) {
+        rawFilters.expired = searchParams.get('expired') === 'true';
+      }
+
+      const filters = validateAndSanitize(BonusCodeFiltersSchema, rawFilters);
+      const bonusCodes = await BonusCodeServiceAdmin.getBonusCodes(filters);
+
+      return NextResponse.json({
+        success: true,
+        data: bonusCodes
+      });
     }
 
-    if (searchParams.get('messageType')) {
-      rawFilters.messageType = searchParams.get('messageType');
-    }
+    // Public path: only return active, non-expired codes with sanitized fields
+    const activeCodes = await BonusCodeServiceAdmin.getBonusCodes({ isActive: true, expired: false });
+    const now = new Date();
+    const sanitized = activeCodes
+      .filter(code => !code.expiresAt || new Date(code.expiresAt) >= now)
+      .map(code => ({
+        id: code.id,
+        code: code.code,
+        rewardAmount: code.rewardAmount,
+        wageredRequirement: code.wageredRequirement,
+        claimsCount: code.claimsCount,
+        expiryDuration: code.expiryDuration,
+        messageType: code.messageType,
+        createdAt: code.createdAt,
+        expiresAt: code.expiresAt,
+        isActive: code.isActive,
+        source: code.source
+      }));
 
-    if (searchParams.get('source')) {
-      rawFilters.source = searchParams.get('source');
-    }
-
-    if (searchParams.get('expired') !== null) {
-      rawFilters.expired = searchParams.get('expired') === 'true';
-    }
-
-    const filters = validateAndSanitize(BonusCodeFiltersSchema, rawFilters);
-    const bonusCodes = await BonusCodeServiceAdmin.getBonusCodes(filters);
-
-    return NextResponse.json({
-      success: true,
-      data: bonusCodes
-    });
+    return NextResponse.json({ success: true, data: sanitized });
   } catch (error) {
     console.error('Error fetching bonus codes:', error);
     return NextResponse.json(
@@ -43,6 +78,7 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = withAdminAuth(async (req: NextRequest, _user: AuthenticatedUser) => {
+  void _user;
   try {
     const rawBody = await req.json();
 

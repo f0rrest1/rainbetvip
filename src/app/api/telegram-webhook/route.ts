@@ -7,14 +7,11 @@ export async function POST(req: NextRequest) {
   try {
     const body: TelegramUpdate = await req.json();
     
-    // Validate webhook secret if configured
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
-    if (webhookSecret) {
-      const providedSecret = req.headers.get('x-telegram-bot-api-secret-token');
-      if (providedSecret !== webhookSecret) {
-        console.log('Invalid webhook secret');
-        return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-      }
+    const providedSecret = req.headers.get('x-telegram-bot-api-secret-token');
+
+    if (!webhookSecret || providedSecret !== webhookSecret) {
+      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Process the update
@@ -32,16 +29,17 @@ export async function POST(req: NextRequest) {
 
 async function processMessage(message: TelegramMessage) {
   try {
-    // Check if we should filter by chat ID
-    const allowedChatId = process.env.TELEGRAM_CHAT_ID;
-    if (allowedChatId && message.chat.id.toString() !== allowedChatId) {
-      console.log(`Message from chat ${message.chat.id} ignored (not in allowed chat ${allowedChatId})`);
+    const allowedChatIdsEnv = process.env.TELEGRAM_ALLOWED_CHAT_IDS || process.env.TELEGRAM_CHAT_ID;
+    if (!allowedChatIdsEnv) {
+      throw new Error('Telegram allowed chat IDs not configured');
+    }
+    const allowedChatIds = allowedChatIdsEnv.split(',').map(id => id.trim()).filter(Boolean);
+    if (!allowedChatIds.includes(message.chat.id.toString())) {
       return;
     }
 
     // Check if this is a bonus code message
     if (!message.text || !BonusCodeParser.isValidBonusCodeMessage(message.text)) {
-      console.log('Message is not a valid bonus code message');
       return;
     }
 
@@ -52,7 +50,6 @@ async function processMessage(message: TelegramMessage) {
     );
 
     if (existingCode) {
-      console.log('Bonus code already exists for this message');
       return;
     }
 
@@ -60,7 +57,6 @@ async function processMessage(message: TelegramMessage) {
     const parsedCode = BonusCodeParser.parseMessage(message);
     
     if (!parsedCode) {
-      console.log('Failed to parse bonus code from message');
       return;
     }
 
@@ -68,21 +64,13 @@ async function processMessage(message: TelegramMessage) {
     const codeExists = await BonusCodeServiceAdmin.codeExists(parsedCode.code, message.chat.id);
     
     if (codeExists) {
-      console.log('Bonus code already exists:', parsedCode.code);
       return;
     }
 
     // Save to Firebase
-    const codeId = await BonusCodeServiceAdmin.createBonusCode(parsedCode);
-    console.log('Bonus code saved successfully:', codeId, parsedCode.code);
-
-    // Optional: Send confirmation to admin or log success
-    // You could add notification logic here
-
+    await BonusCodeServiceAdmin.createBonusCode(parsedCode);
   } catch (error) {
     console.error('Error processing message:', error);
     // Don't throw - we want to acknowledge the webhook even if processing fails
   }
 }
-
-

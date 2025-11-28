@@ -1,8 +1,7 @@
-import { NextRequest } from "next/server";
 import { doc, getDoc } from 'firebase/firestore';
 import { getDbInstance } from '@/lib/firebase';
 
-export const GET = async (_req: NextRequest) => {
+export const GET = async () => {
   try {
     const settingsDoc = await getDoc(doc(getDbInstance(), 'settings', 'site'));
 

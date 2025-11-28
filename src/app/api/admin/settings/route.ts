@@ -4,6 +4,8 @@ import { withAdminAuth, AuthenticatedUser } from "@/lib/auth";
 import { validateAndSanitize, sanitizeError, SiteSettingsSchema } from "@/lib/validation";
 
 export const GET = withAdminAuth(async (_req: NextRequest, _user: AuthenticatedUser) => {
+  void _req;
+  void _user;
   try {
     const db = getAdminDb();
     const settingsDoc = await db.collection('settings').doc('site').get();
@@ -62,6 +64,7 @@ export const GET = withAdminAuth(async (_req: NextRequest, _user: AuthenticatedU
 });
 
 export const POST = withAdminAuth(async (req: NextRequest, _user: AuthenticatedUser) => {
+  void _user;
   try {
     const rawSettings = await req.json();
 
