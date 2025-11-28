@@ -14,7 +14,7 @@ const getFirebaseConfig = () => {
   }
 
   // Add some debugging to understand what's happening
-  console.log('🔧 Attempting to load Firebase config...');
+  console.log('Attempting to load Firebase config...');
 
   const envVars = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -25,7 +25,7 @@ const getFirebaseConfig = () => {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
   };
 
-  console.log('🔧 Environment variables status:', {
+  console.log('Environment variables status:', {
     hasApiKey: !!envVars.apiKey,
     hasAuthDomain: !!envVars.authDomain,
     hasProjectId: !!envVars.projectId,
