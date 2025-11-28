@@ -30,12 +30,20 @@ export async function POST(req: NextRequest) {
 async function processMessage(message: TelegramMessage) {
   try {
     const allowedChatIdsEnv = process.env.TELEGRAM_ALLOWED_CHAT_IDS || process.env.TELEGRAM_CHAT_ID;
-    if (!allowedChatIdsEnv) {
-      throw new Error('Telegram allowed chat IDs not configured');
+    if (allowedChatIdsEnv) {
+      const allowedChatIds = allowedChatIdsEnv.split(',').map(id => id.trim()).filter(Boolean);
+      if (!allowedChatIds.includes(message.chat.id.toString())) {
+        return;
+      }
     }
-    const allowedChatIds = allowedChatIdsEnv.split(',').map(id => id.trim()).filter(Boolean);
-    if (!allowedChatIds.includes(message.chat.id.toString())) {
-      return;
+
+    const allowedUserIdsEnv = process.env.TELEGRAM_ALLOWED_USER_IDS;
+    if (allowedUserIdsEnv) {
+      const allowedUserIds = allowedUserIdsEnv.split(',').map(id => id.trim()).filter(Boolean);
+      const senderId = message.from?.id?.toString();
+      if (!senderId || !allowedUserIds.includes(senderId)) {
+        return;
+      }
     }
 
     // Check if this is a bonus code message
