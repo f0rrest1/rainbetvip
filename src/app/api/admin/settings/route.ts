@@ -16,6 +16,9 @@ export const GET = withAdminAuth(async (_req: NextRequest, _user: AuthenticatedU
     }
 
     const data = settingsDoc.data();
+    if (!data) {
+      return Response.json({ success: true, data: defaultSiteSettings });
+    }
     const mergedData = {
       ...defaultSiteSettings,
       ...data,
