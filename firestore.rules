@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only allow authenticated admin users
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Bonus codes collection - public read, admin write
+    match /bonusCodes/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // News collection - public read, admin write
+    match /news/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // News cache collection - public read, write
+    match /newsCache/{document} {
+      allow read, write: if true;
+    }
+
+    // Site settings collection - public read, admin write
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "rainbetvip-website",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "check-env": "node scripts/check-env.js",
+    "setup-telegram": "node scripts/setup-telegram-bot.js",
+    "test-telegram": "node scripts/setup-telegram-bot.js test",
+    "test-parser": "node scripts/test-bonus-parser.js",
+    "test-firebase": "node scripts/test-firebase-admin.js",
+    "quick-setup": "node scripts/quick-setup.js"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@headlessui/react": "^2.2.8",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "@uiw/react-md-editor": "^4.0.8",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.18",
+    "dotenv": "^17.2.2",
+    "firebase": "^12.3.0",
+    "firebase-admin": "^13.5.0",
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-flip-toolkit": "^7.2.4",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "rss-parser": "^3.13.0",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
