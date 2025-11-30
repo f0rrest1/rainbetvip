@@ -136,7 +136,7 @@ export default function Hero() {
           </Link>
 
           <a
-            href="https://rainbet.com"
+            href="https://rainbet.com?r=frost"
             target="_blank"
             rel="noreferrer"
             className="rbv-button-secondary inline-flex items-center justify-center gap-2 text-center"

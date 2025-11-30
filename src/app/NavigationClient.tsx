@@ -16,7 +16,7 @@ export function NavigationClient() {
   }, []);
 
   const openRainbet = useCallback(() => {
-    window.open("https://rainbet.com", "_blank", "noopener,noreferrer");
+    window.open("https://rainbet.com?r=frost", "_blank", "noopener,noreferrer");
   }, []);
 
   const handleRewardz = useCallback(() => {

@@ -156,7 +156,7 @@ export default function RootLayout({
                 <div>
                   <h4 className="font-bold text-white mb-4">Gaming</h4>
                   <div className="space-y-2">
-                    <a href="https://rainbet.com" target="_blank" rel="noreferrer" className="block text-white/70 hover:text-white transition-colors">Rainbet Casino</a>
+                    <a href="https://rainbet.com?r=frost" target="_blank" rel="noreferrer" className="block text-white/70 hover:text-white transition-colors">Rainbet Casino</a>
                     <a href="https://rewardz.gg" target="_blank" rel="noreferrer" className="block text-white/70 hover:text-white transition-colors">Rewardz</a>
                     <a href="https://wits.gg" target="_blank" rel="noreferrer" className="block text-white/70 hover:text-white transition-colors">Wits</a>
                   </div>
